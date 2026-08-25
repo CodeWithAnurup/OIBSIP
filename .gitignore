@@ -1,0 +1,23 @@
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual documents (Jupyter)
+.virtual_documents/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+*.egg-info/
