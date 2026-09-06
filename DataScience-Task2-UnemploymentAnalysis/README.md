@@ -61,6 +61,9 @@ Analyze unemployment trends across Indian states during the COVID-19 pandemic, c
 - **Rural areas:** Labour Participation Rate has near-zero correlation with Unemployment Rate (-0.02) — when jobs disappear, people stop looking (discouragement effect)
 - **Urban areas:** When one person loses a job, someone else in the family steps up and starts looking for work
 
+> **Note on -1.0 correlation:** The perfect `-1.0` between *Unemployment Rate* and *Employment Rate* is **not a data anomaly** — it is mathematically forced since `Employment Rate = 100 - Unemployment Rate`. The meaningful correlations are in the Labour Participation Rate column.
+
+
 ---
 
 ## 🦠 Pre-COVID vs During-COVID Impact
