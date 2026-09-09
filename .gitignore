@@ -21,3 +21,7 @@ desktop.ini
 # Environment
 .env
 *.egg-info/
+
+# WeatherTrayApp
+WeatherTrayApp/weather_config.json
+WeatherTrayApp/test_tray.py

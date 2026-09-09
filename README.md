@@ -13,6 +13,7 @@
 | 1 | Task 2 | [Unemployment Analysis with Python](DataScience-Task2-UnemploymentAnalysis/) | ✅ Completed |
 | 2 | Task 3 | [Car Price Prediction with ML](DataScience-Task3-CarPricePrediction/) | ✅ Completed |
 | 3 | Task 5 | [Sales Prediction Using Python](DataScience-Task5-SalesPrediction/) | ✅ Completed |
+| 4 | Bonus | [🌤️ Weather Tray App — System Tray Weather](WeatherTrayApp/) | ✅ Completed |
 
 ---
 
@@ -25,6 +26,7 @@
 ![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualization-red)
 ![Seaborn](https://img.shields.io/badge/Seaborn-Visualization-blue)
 ![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange)
+![pystray](https://img.shields.io/badge/pystray-System%20Tray-purple)
 
 ---
 
@@ -48,6 +50,16 @@ OIBSIP/
 │   ├── Advertising Budget and Sales.csv
 │   ├── images/
 │   └── README.md
+├── WeatherTrayApp/
+│   ├── main.py
+│   ├── tray_app.py
+│   ├── weather_api.py
+│   ├── weather_panel.py
+│   ├── config.py
+│   ├── requirements.txt
+│   └── README.md
+├── .github/workflows/
+│   └── weather-app-ci.yml
 └── README.md  ← You are here
 ```
 

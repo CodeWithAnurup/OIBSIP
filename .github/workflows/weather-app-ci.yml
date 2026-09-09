@@ -1,0 +1,124 @@
+name: WeatherTrayApp CI
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'WeatherTrayApp/**'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'WeatherTrayApp/**'
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: WeatherTrayApp
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 pytest
+
+      - name: Lint with flake8
+        working-directory: WeatherTrayApp
+        run: |
+          # Stop build on syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Warnings as non-blocking
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+
+      - name: Test imports
+        working-directory: WeatherTrayApp
+        run: |
+          python -c "from config import load_config, save_config; print('config.py OK')"
+          python -c "from weather_api import get_coordinates, get_weather, fetch_full_weather, WMO_CODES; print('weather_api.py OK')"
+          python -c "from weather_panel import WeatherPanel, COLORS; print('weather_panel.py OK')"
+
+      - name: Test API connection
+        working-directory: WeatherTrayApp
+        run: |
+          python -c "
+          from weather_api import fetch_full_weather
+          data = fetch_full_weather('London')
+          assert data is not None, 'API returned None'
+          assert 'temperature' in data, 'Missing temperature'
+          assert 'humidity' in data, 'Missing humidity'
+          assert 'forecast' in data, 'Missing forecast'
+          assert len(data['forecast']) > 0, 'Empty forecast'
+          print(f'API Test PASSED: {data[\"name\"]} {data[\"temperature\"]}{data[\"unit_symbol\"]}')
+          "
+
+      - name: Test config save/load
+        working-directory: WeatherTrayApp
+        run: |
+          python -c "
+          import os, json
+          from config import save_config, load_config, CONFIG_FILE
+          
+          # Save
+          test_config = {'city': 'TestCity', 'temperature_unit': 'fahrenheit'}
+          save_config(test_config)
+          assert os.path.exists(CONFIG_FILE), 'Config file not created'
+          
+          # Load
+          loaded = load_config()
+          assert loaded['city'] == 'TestCity', f'City mismatch: {loaded[\"city\"]}'
+          assert loaded['temperature_unit'] == 'fahrenheit', 'Unit mismatch'
+          
+          # Cleanup
+          os.remove(CONFIG_FILE)
+          print('Config Test PASSED')
+          "
+
+      - name: Test geocoding
+        working-directory: WeatherTrayApp
+        run: |
+          python -c "
+          from weather_api import get_coordinates
+          
+          # Test valid city
+          result = get_coordinates('Tokyo')
+          assert result is not None, 'Tokyo not found'
+          assert 'latitude' in result, 'Missing latitude'
+          assert 'longitude' in result, 'Missing longitude'
+          assert result['country'] == 'Japan', f'Wrong country: {result[\"country\"]}'
+          print(f'Geocoding Test PASSED: {result[\"name\"]}, {result[\"country\"]}')
+          
+          # Test invalid city
+          result2 = get_coordinates('xyznotacity12345')
+          assert result2 is None, 'Should return None for invalid city'
+          print('Invalid city test PASSED')
+          "
+
+      - name: Test WMO weather codes
+        working-directory: WeatherTrayApp
+        run: |
+          python -c "
+          from weather_api import WMO_CODES
+          
+          # Check key codes exist
+          assert 0 in WMO_CODES, 'Missing clear sky code'
+          assert 95 in WMO_CODES, 'Missing thunderstorm code'
+          
+          # Check format
+          desc, emoji = WMO_CODES[0]
+          assert isinstance(desc, str), 'Description should be string'
+          assert len(desc) > 0, 'Description should not be empty'
+          print(f'WMO Codes Test PASSED: {len(WMO_CODES)} codes defined')
+          "
